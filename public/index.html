@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Arquitetura Empresarial</title>
+<style>
+:root{--purple:#63368a;--purple2:#7c4aa5;--bg:#f6f3fa;--card:#fff;--text:#273043;--muted:#667085;--line:#e5e0eb;--blue:#eaf3ff;--green:#eaf8f0;--orange:#fff4e5;--red:#fff0f0;--shadow:0 8px 24px rgba(50,30,80,.08)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#5c327f,#7d4da2);color:#fff;padding:24px 28px;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px #0002}
+header h1{margin:0 0 6px;font-size:25px}header p{margin:0;opacity:.9}
+nav{display:flex;gap:8px;max-width:1250px;margin:0 auto;padding:14px 18px 0;overflow:auto}
+nav button{border:0;background:#eee7f4;color:#5d3679;padding:11px 15px;border-radius:10px 10px 0 0;font-weight:700;cursor:pointer;white-space:nowrap}
+nav button.active{background:#fff;color:var(--purple)}
+main{max-width:1250px;margin:0 auto;padding:18px}.tab{display:none}.tab.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);margin-bottom:18px}
+.kpi{font-size:29px;font-weight:800;color:var(--purple)}.muted{color:var(--muted);font-size:13px}
+h2{margin:4px 0 15px;color:var(--purple);font-size:21px}h3{margin:0 0 8px}
+button.primary{background:var(--purple);color:#fff;border:0;border-radius:10px;padding:10px 15px;font-weight:700;cursor:pointer}
+button.secondary{background:#f0eaf5;color:var(--purple);border:0;border-radius:10px;padding:10px 15px;font-weight:700;cursor:pointer}
+button.danger{background:#fff0f0;color:#b42318;border:0;border-radius:8px;padding:7px 10px;cursor:pointer}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid #d7d1df;border-radius:9px;background:#fff;color:var(--text);font:inherit}
+textarea{min-height:80px;resize:vertical}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.full{grid-column:1/-1}label{font-size:13px;font-weight:700;display:block;margin-bottom:5px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#5d3679;background:#faf8fc}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.domain{background:#e6f0ff;color:#205493}.business_service{background:#e9f8ef;color:#147a43}.application_service{background:#fff1df;color:#a45500}.technology{background:#f0e8f8;color:#66378b}.critical{background:#ffe7e7;color:#b42318}
+.arch{display:grid;grid-template-columns:1fr;gap:10px}.layer{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.layer-title{font-weight:800;color:var(--purple);margin-bottom:10px}.nodes{display:flex;gap:10px;flex-wrap:wrap}.node{padding:10px 12px;border-radius:11px;border:1px solid #ddd5e6;background:#faf9fc;min-width:150px}.node b{display:block;margin-bottom:3px}.node small{color:var(--muted)}
+.rel-list{max-height:430px;overflow:auto}.rel{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.rel:last-child{border-bottom:0}
+.empty{padding:28px;text-align:center;color:var(--muted)}.notice{padding:12px 14px;background:var(--blue);border-radius:10px;margin-bottom:15px}
+.impact-root{background:#f1e9f7;border:1px solid #d8c5e5;padding:14px;border-radius:12px;margin-bottom:12px}.impact-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.impact-item{padding:11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:560px){.grid,.formgrid,.impact-list{grid-template-columns:1fr}main{padding:12px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<header><h1>Mapa de Arquitetura Empresarial</h1><p>Dependências • redundâncias • criticidade • impacto de mudança</p></header>
+<nav>
+<button class="active" data-tab="visao">Visão geral</button><button data-tab="ativos">Ativos arquiteturais</button>
+<button data-tab="relacoes">Relacionamentos</button><button data-tab="impacto">Análise de impacto</button><button data-tab="analise">Redundâncias & pontos críticos</button>
+</nav>
+<main>
+<section id="visao" class="tab active">
+<div class="notice"><b>Objetivo do sistema:</b> organizar a visão empresarial em camadas, mapear relações entre domínios e diferenciar serviços de negócio, serviços de aplicação e componentes tecnológicos.</div>
+<div id="kpis" class="grid"></div>
+<div class="card"><div class="toolbar"><h2>Arquitetura em camadas</h2><button class="secondary" onclick="loadAll()">Atualizar</button></div><div id="architecture" class="arch"></div></div>
+<div class="grid2">
+<div class="card"><h2>O que a solução identifica</h2><ul><li>Domínios arquiteturais e responsáveis.</li><li>Dependências entre negócio, aplicações e tecnologia.</li><li>Componentes críticos e concentradores de dependências.</li><li>Redundâncias por ativos com o mesmo nome/tipo.</li><li>Impacto cruzado por cadeia de dependências.</li></ul></div>
+<div class="card"><h2>Fluxo de análise</h2><div class="actions"><button class="primary" onclick="go('ativos')">1. Cadastrar ativos</button><button class="secondary" onclick="go('relacoes')">2. Mapear relações</button><button class="secondary" onclick="go('impacto')">3. Simular impacto</button></div><p class="muted" style="margin-top:12px">Os dados são persistidos no SQLite por meio do Node.js.</p></div>
+</div>
+</section>
+
+<section id="ativos" class="tab">
+<div class="card"><div class="toolbar"><div><h2>Cadastro de ativos</h2><div class="muted">Inclua ou altere elementos da arquitetura.</div></div><button class="secondary" onclick="resetAssetForm()">Novo</button></div>
+<form id="assetForm" class="formgrid">
+<input type="hidden" id="assetId">
+<div><label>Nome *</label><input id="assetName" required></div>
+<div><label>Tipo *</label><select id="assetType" required><option value="domain">Domínio arquitetural</option><option value="business_service">Serviço de negócio</option><option value="application_service">Serviço de aplicação</option><option value="technology">Componente tecnológico</option></select></div>
+<div><label>Responsável</label><input id="assetOwner"></div><div><label>Status</label><select id="assetStatus"><option>Ativo</option><option>Em revisão</option><option>Descontinuado</option></select></div>
+<div class="full"><label>Descrição</label><textarea id="assetDescription"></textarea></div>
+<div><label><input type="checkbox" id="assetCritical" style="width:auto"> Marcar como crítico</label></div>
+<div class="actions"><button class="primary">Salvar ativo</button><button type="button" class="secondary" onclick="resetAssetForm()">Limpar</button></div>
+</form></div>
+<div class="card"><div class="toolbar"><h2>Ativos cadastrados</h2><input id="assetSearch" placeholder="Pesquisar..." style="max-width:280px" oninput="renderAssets()"></div><div id="assetTable"></div></div>
+</section>
+
+<section id="relacoes" class="tab">
+<div class="grid2">
+<div class="card"><h2>Mapear relacionamento</h2>
+<form id="relForm">
+<label>Origem *</label><select id="sourceId" required></select><br><br>
+<label>Destino *</label><select id="targetId" required></select><br><br>
+<label>Tipo de relação</label><select id="relationType"><option>Depende de</option><option>Utiliza</option><option>Suporta</option><option>Integra com</option><option>Persiste em</option><option>Executa em</option><option>Disponibiliza</option><option>Valida em</option></select><br><br>
+<label>Nível de impacto</label><select id="impactLevel"><option>Baixo</option><option>Médio</option><option>Alto</option><option>Crítico</option></select><br><br>
+<label>Descrição</label><textarea id="relDescription"></textarea><br>
+<button class="primary">Salvar relacionamento</button>
+</form></div>
+<div class="card"><h2>Relacionamentos</h2><div id="relTable" class="rel-list"></div></div>
+</div>
+</section>
+
+<section id="impacto" class="tab">
+<div class="card"><h2>Análise de impacto cruzado</h2><p class="muted">Selecione um ativo para descobrir o que depende dele (impacto downstream) e do que ele depende (upstream).</p>
+<select id="impactAsset" onchange="runImpact()"></select>
+<div id="impactResult" style="margin-top:16px"></div></div>
+</section>
+
+<section id="analise" class="tab">
+<div class="grid2">
+<div class="card"><h2>Redundâncias</h2><p class="muted">Ativos com mesmo nome e tipo podem indicar duplicidade ou oportunidade de consolidação.</p><div id="redundancy"></div></div>
+<div class="card"><h2>Pontos críticos</h2><p class="muted">Ativos marcados como críticos e seu grau de dependência.</p><div id="critical"></div></div>
+</div>
+<div class="card"><h2>Concentradores de dependência</h2><div id="hotspots"></div></div>
+</section>
+</main>
+<script>
+let assets=[], relationships=[], analysis={};
+const labels={domain:"Domínio",business_service:"Serviço de negócio",application_service:"Serviço de aplicação",technology:"Tecnologia"};
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+async function api(url,opt={}){const r=await fetch(url,{headers:{"Content-Type":"application/json"},...opt}); if(r.status===204)return null; const d=await r.json(); if(!r.ok)throw Error(d.error||"Erro"); return d}
+function go(id){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelector(`[data-tab="${id}"]`).classList.add("active")}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+async function loadAll(){assets=await api("/api/assets");relationships=await api("/api/relationships");analysis=await api("/api/analysis");renderAll()}
+function renderAll(){renderKpis();renderArchitecture();renderAssets();renderAssetOptions();renderRels();renderImpactOptions();renderAnalysis()}
+function renderKpis(){const counts={domain:0,business_service:0,application_service:0,technology:0};assets.forEach(a=>counts[a.type]++);document.getElementById("kpis").innerHTML=[
+["Ativos",assets.length],["Domínios",counts.domain],["Relações",relationships.length],["Críticos",assets.filter(a=>a.critical).length]
+].map(x=>`<div class="card"><div class="muted">${x[0]}</div><div class="kpi">${x[1]}</div></div>`).join("")}
+function renderArchitecture(){document.getElementById("architecture").innerHTML=["domain","business_service","application_service","technology"].map(t=>`<div class="layer"><div class="layer-title">${labels[t]}</div><div class="nodes">${assets.filter(a=>a.type===t).map(a=>`<div class="node"><b>${esc(a.name)} ${a.critical?'<span class="badge critical">CRÍTICO</span>':''}</b><small>${esc(a.owner||"Sem responsável")}</small></div>`).join("")||'<span class="muted">Nenhum ativo.</span>'}</div></div>`).join("")}
+function renderAssets(){const q=(document.getElementById("assetSearch")?.value||"").toLowerCase();const rows=assets.filter(a=>(a.name+" "+a.owner+" "+labels[a.type]).toLowerCase().includes(q));document.getElementById("assetTable").innerHTML=`<table><thead><tr><th>Nome</th><th>Tipo</th><th>Responsável</th><th>Status</th><th>Ações</th></tr></thead><tbody>${rows.map(a=>`<tr><td><b>${esc(a.name)}</b><br><span class="muted">${esc(a.description)}</span></td><td><span class="badge ${a.type}">${labels[a.type]}</span></td><td>${esc(a.owner||"-")}</td><td>${esc(a.status)}</td><td><button class="secondary" onclick="editAsset(${a.id})">Editar</button> <button class="danger" onclick="deleteAsset(${a.id})">Excluir</button></td></tr>`).join("")||'<tr><td colspan="5" class="empty">Nenhum ativo encontrado.</td></tr>'}</tbody></table>`}
+function renderAssetOptions(){["sourceId","targetId","impactAsset"].forEach(id=>{const s=document.getElementById(id),old=s.value;s.innerHTML='<option value="">Selecione...</option>'+assets.map(a=>`<option value="${a.id}">${esc(a.name)} — ${labels[a.type]}</option>`).join("");if(old)s.value=old})}
+function renderRels(){document.getElementById("relTable").innerHTML=relationships.map(r=>`<div class="rel"><div><b>${esc(r.source_name)}</b> <span class="muted">→ ${esc(r.target_name)}</span><br><span class="badge ${r.impact_level==="Crítico"||r.impact_level==="Alto"?"critical":""}">${esc(r.relation_type)} • ${esc(r.impact_level)}</span></div><button class="danger" onclick="deleteRel(${r.id})">Excluir</button></div>`).join("")||'<div class="empty">Nenhum relacionamento.</div>'}
+function renderImpactOptions(){if(!document.getElementById("impactAsset").value&&assets[0])document.getElementById("impactAsset").value=assets[0].id;if(document.getElementById("impactAsset").value)runImpact()}
+function renderAnalysis(){document.getElementById("redundancy").innerHTML=analysis.redundancy.length?analysis.redundancy.map(x=>`<div class="impact-item"><b>${esc(x.names)}</b><br><span class="muted">${labels[x.type]} • ${x.total} ocorrências</span></div>`).join("<br>"):'<div class="empty">Nenhuma redundância encontrada.</div>';
+document.getElementById("critical").innerHTML=analysis.critical.length?`<table><tr><th>Ativo</th><th>Dependentes</th><th>Dependências</th></tr>${analysis.critical.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${x.dependents}</td><td>${x.dependencies}</td></tr>`).join("")}</table>`:'<div class="empty">Nenhum ativo crítico.</div>';
+document.getElementById("hotspots").innerHTML=`<table><tr><th>Ativo</th><th>Tipo</th><th>Grau de conexão</th></tr>${analysis.hotspots.map(x=>`<tr><td>${esc(x.name)} ${x.critical?'<span class="badge critical">CRÍTICO</span>':''}</td><td>${labels[x.type]}</td><td><b>${x.degree}</b></td></tr>`).join("")}</table>`}
+async function runImpact(){const id=document.getElementById("impactAsset").value;if(!id)return;const d=await api("/api/impact/"+id);const list=(arr)=>arr.length?`<div class="impact-list">${arr.map(x=>`<div class="impact-item"><b>${esc(x.name)}</b> ${x.critical?'<span class="badge critical">CRÍTICO</span>':''}<br><span class="muted">${labels[x.type]} • nível ${x.depth}</span></div>`).join("")}</div>`:'<div class="empty">Nenhum elemento relacionado.</div>';document.getElementById("impactResult").innerHTML=`<div class="impact-root"><b>${esc(d.root.name)}</b> — ${labels[d.root.type]}<br><span class="muted">${esc(d.root.description)}</span></div><h3>Impacto downstream: ${d.downstream.length}</h3>${list(d.downstream)}<h3 style="margin-top:18px">Dependências upstream: ${d.upstream.length}</h3>${list(d.upstream)}`}
+document.getElementById("assetForm").onsubmit=async e=>{e.preventDefault();const id=document.getElementById("assetId").value;const body={name:assetName.value,type:assetType.value,owner:assetOwner.value,status:assetStatus.value,description:assetDescription.value,critical:assetCritical.checked};try{await api(id?"/api/assets/"+id:"/api/assets",{method:id?"PUT":"POST",body:JSON.stringify(body)});resetAssetForm();await loadAll();alert("Ativo salvo com sucesso.");}catch(e){alert(e.message)}};
+function editAsset(id){const a=assets.find(x=>x.id===id);assetId.value=a.id;assetName.value=a.name;assetType.value=a.type;assetOwner.value=a.owner;assetStatus.value=a.status;assetDescription.value=a.description;assetCritical.checked=!!a.critical;go("ativos");window.scrollTo({top:0,behavior:"smooth"})}
+async function deleteAsset(id){if(!confirm("Excluir este ativo e seus relacionamentos?"))return;try{await api("/api/assets/"+id,{method:"DELETE"});await loadAll()}catch(e){alert(e.message)}}
+function resetAssetForm(){assetId.value="";assetName.value="";assetOwner.value="";assetDescription.value="";assetCritical.checked=false;assetStatus.value="Ativo";assetType.value="domain"}
+document.getElementById("relForm").onsubmit=async e=>{e.preventDefault();try{await api("/api/relationships",{method:"POST",body:JSON.stringify({source_id:Number(sourceId.value),target_id:Number(targetId.value),relation_type:relationType.value,impact_level:impactLevel.value,description:relDescription.value})});e.target.reset();await loadAll();alert("Relacionamento salvo com sucesso.");}catch(e){alert(e.message)}};
+async function deleteRel(id){if(!confirm("Excluir relacionamento?"))return;await api("/api/relationships/"+id,{method:"DELETE"});await loadAll()}
+loadAll().catch(e=>alert("Não foi possível carregar o sistema: "+e.message));
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "arquitetura-empresarial-sqlite",
+  "version": "1.0.0",
+  "description": "Sistema web de arquitetura empresarial com Node.js e SQLite.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
