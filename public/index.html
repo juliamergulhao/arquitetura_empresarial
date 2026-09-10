@@ -41,6 +41,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 </nav>
 <main>
 <section id="visao" class="tab active">
+<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,#fff,#f2eafa);border:2px solid #d9c5e8">
+<div><h2 style="margin:0 0 5px">Relatório completo do sistema</h2><div class="muted">Exporte todos os dados cadastrados, relacionamentos, análises e impacto cruzado em PDF.</div></div>
+<button class="primary" style="font-size:16px;padding:13px 20px" onclick="generateReport()">📄 Gerar relatório PDF</button>
+</div>
 <div class="notice"><b>Objetivo do sistema:</b> organizar a visão empresarial em camadas, mapear relações entre domínios e diferenciar serviços de negócio, serviços de aplicação e componentes tecnológicos.</div>
 <div id="kpis" class="grid"></div>
 <div class="card"><div class="toolbar"><h2>Arquitetura em camadas</h2><button class="secondary" onclick="loadAll()">Atualizar</button></div><div id="architecture" class="arch"></div></div>
@@ -97,6 +101,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
 let assets=[], relationships=[], analysis={};
 const labels={domain:"Domínio",business_service:"Serviço de negócio",application_service:"Serviço de aplicação",technology:"Tecnologia"};
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+async function generateReport(){
+  try{const r=await fetch("/api/report.pdf");if(!r.ok)throw Error("Não foi possível gerar o relatório.");const blob=await r.blob();const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="relatorio-arquitetura-empresarial.pdf";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u)}catch(e){alert(e.message)}}
 async function api(url,opt={}){const r=await fetch(url,{headers:{"Content-Type":"application/json"},...opt}); if(r.status===204)return null; const d=await r.json(); if(!r.ok)throw Error(d.error||"Erro"); return d}
 function go(id){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelector(`[data-tab="${id}"]`).classList.add("active")}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>go(b.dataset.tab));

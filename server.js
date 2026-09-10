@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
+const PDFDocument = require("pdfkit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -98,6 +99,36 @@ async function initDb() {
     }
   }
 }
+
+app.get("/api/report.pdf", async (req,res) => {
+  try {
+    const assets = await all(`SELECT * FROM assets ORDER BY type, name`);
+    const relationships = await all(`SELECT r.*, s.name AS source_name, s.type AS source_type, t.name AS target_name, t.type AS target_type FROM relationships r JOIN assets s ON s.id=r.source_id JOIN assets t ON t.id=r.target_id ORDER BY r.id`);
+    const redundancy = await all(`SELECT LOWER(TRIM(name)) AS key, type, COUNT(*) AS total, GROUP_CONCAT(name, ' | ') AS names FROM assets GROUP BY LOWER(TRIM(name)), type HAVING COUNT(*) > 1 ORDER BY total DESC`);
+    const critical = await all(`SELECT a.*, (SELECT COUNT(*) FROM relationships r WHERE r.target_id=a.id) AS dependents, (SELECT COUNT(*) FROM relationships r WHERE r.source_id=a.id) AS dependencies FROM assets a WHERE a.critical=1 ORDER BY dependents DESC, dependencies DESC`);
+    const hotspots = await all(`SELECT a.id,a.name,a.type,a.critical, (SELECT COUNT(*) FROM relationships r WHERE r.source_id=a.id) + (SELECT COUNT(*) FROM relationships r WHERE r.target_id=a.id) AS degree FROM assets a ORDER BY degree DESC LIMIT 10`);
+    const labels = {domain:"Domínio arquitetural", business_service:"Serviço de negócio", application_service:"Serviço de aplicação", technology:"Componente tecnológico"};
+    const doc = new PDFDocument({size:"A4", margin:45, bufferPages:true, info:{Title:"Relatório de Arquitetura Empresarial", Author:"Sistema de Arquitetura Empresarial"}});
+    res.setHeader("Content-Type","application/pdf"); res.setHeader("Content-Disposition","attachment; filename=relatorio-arquitetura-empresarial.pdf"); doc.pipe(res);
+    const ensure=()=>{if(doc.y>755)doc.addPage()};
+    const title=t=>{ensure();doc.font("Helvetica-Bold").fontSize(17).fillColor("#63368a").text(t);doc.moveDown(.35);doc.font("Helvetica").fillColor("#273043")};
+    const line=(t,size=9.5)=>{ensure();doc.font("Helvetica").fontSize(size).fillColor("#273043").text(t,{lineGap:2});};
+    doc.font("Helvetica-Bold").fontSize(24).fillColor("#63368a").text("Relatório de Arquitetura Empresarial"); doc.font("Helvetica").fontSize(10).fillColor("#667085").text(`Gerado em ${new Date().toLocaleString("pt-BR")}`); doc.moveDown(.7);
+    line("Objetivo: organizar uma visão empresarial em camadas, identificando dependências, redundâncias e impactos de mudança.",10); doc.moveDown(.4); line(`Resumo: ${assets.length} ativos | ${relationships.length} relacionamentos | ${critical.length} ativos críticos | ${redundancy.length} grupos de possíveis redundâncias`,10);
+    title("1. Visão da arquitetura em camadas");
+    for(const type of ["domain","business_service","application_service","technology"]){doc.font("Helvetica-Bold").fontSize(12).fillColor("#63368a").text(labels[type]);assets.filter(a=>a.type===type).forEach(a=>line(`• ${a.name}${a.critical?" [CRÍTICO]":""} — Responsável: ${a.owner||"Não informado"}. ${a.description||""}`));doc.moveDown(.25)}
+    title("2. Ativos cadastrados"); assets.forEach((a,i)=>line(`${i+1}. ${a.name} | ${labels[a.type]} | Status: ${a.status} | Responsável: ${a.owner||"-"}${a.critical?" | CRÍTICO":""}\n   ${a.description||"Sem descrição."}`));
+    title("3. Relacionamentos e dependências"); if(!relationships.length)line("Nenhum relacionamento cadastrado."); relationships.forEach((r,i)=>line(`${i+1}. ${r.source_name} → ${r.target_name} | ${r.relation_type} | Impacto: ${r.impact_level}${r.description?` | ${r.description}`:""}`));
+    title("4. Redundâncias identificadas"); if(!redundancy.length)line("Nenhuma possível redundância encontrada."); redundancy.forEach((r,i)=>line(`${i+1}. ${r.names} | ${labels[r.type]} | ${r.total} ocorrências`));
+    title("5. Pontos críticos"); if(!critical.length)line("Nenhum ativo marcado como crítico."); critical.forEach((a,i)=>line(`${i+1}. ${a.name} | Dependentes: ${a.dependents} | Dependências: ${a.dependencies}`));
+    title("6. Concentradores de dependência"); hotspots.forEach((a,i)=>line(`${i+1}. ${a.name} | ${labels[a.type]} | Grau de conexão: ${a.degree}${a.critical?" | CRÍTICO":""}`));
+    title("7. Análise de impacto cruzado");
+    for(const root of assets){const downstream=await all(`WITH RECURSIVE deps(id, depth, path) AS (SELECT target_id,1,printf('%d',target_id) FROM relationships WHERE source_id=? UNION ALL SELECT r.target_id,d.depth+1,d.path||','||r.target_id FROM relationships r JOIN deps d ON r.source_id=d.id WHERE d.depth<20 AND instr(','||d.path||',',','||r.target_id||',')=0) SELECT DISTINCT a.name,a.type,a.critical,MIN(d.depth) AS depth FROM deps d JOIN assets a ON a.id=d.id GROUP BY a.id ORDER BY depth,a.name`,[root.id]); if(downstream.length)line(`• ${root.name}: ${downstream.map(x=>`${x.name} (nível ${x.depth}${x.critical?", crítico":""})`).join(", ")}`)}
+    if(!relationships.length)line("Cadastre relacionamentos para gerar a análise de impacto.");
+    title("8. Conclusão"); line("O sistema permite caracterizar os domínios arquiteturais, mapear relações, distinguir as camadas de negócio/aplicação/tecnologia, identificar possíveis redundâncias e pontos críticos e avaliar impactos decorrentes de mudanças na arquitetura.",10);
+    const range=doc.bufferedPageRange(); for(let i=range.start;i<range.start+range.count;i++){doc.switchToPage(i);doc.font("Helvetica").fontSize(8).fillColor("#667085").text(`Relatório de Arquitetura Empresarial • Página ${i+1} de ${range.count}`,45,805,{align:"center",width:505})} doc.end();
+  } catch(e){console.error(e);if(!res.headersSent)res.status(500).json({error:e.message});}
+});
 
 app.get("/api/assets", async (req,res) => {
   try { res.json(await all(`SELECT * FROM assets ORDER BY type, name`)); }
