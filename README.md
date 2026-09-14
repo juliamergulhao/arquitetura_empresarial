@@ -1,6 +1,6 @@
 # Enterprise Architecture System 🏢
 
-O sistema está publicado e pode ser acessado online:
+Sistema web para **mapeamento e análise de arquitetura empresarial**, permitindo visualizar dependências, identificar ativos críticos e analisar impactos entre componentes de TI.
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Acessar%20Aplicação-00C7B7?style=for-the-badge)](https://arquitetura-empresarial.onrender.com/)
 [![GitHub](https://img.shields.io/badge/Source%20Code-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/juliamergulhao/enterprise-architecture-system)
