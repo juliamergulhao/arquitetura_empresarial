@@ -1,68 +1,76 @@
-# Mapa de Arquitetura Empresarial
+# Enterprise Architecture System 🏢
 
-Sistema web desenvolvido para atender ao objetivo do slide: organizar uma visão empresarial em camadas, mapear relações entre domínios, distinguir serviço de negócio, serviço de aplicação e componente tecnológico, identificar redundâncias/pontos críticos e realizar análise de impacto cruzado.
+Sistema web desenvolvido para **mapeamento e análise de arquitetura empresarial**, permitindo organizar ativos tecnológicos, visualizar dependências e identificar pontos críticos dentro de uma estrutura corporativa.
 
-## Tecnologias
-- HTML5
-- CSS3
-- JavaScript puro (frontend em um único `public/index.html`)
-- Node.js + Express
-- SQLite
+A aplicação permite representar diferentes camadas da arquitetura de TI e analisar como serviços, aplicações e componentes tecnológicos se relacionam.
 
-## Funcionalidades
-1. Cadastro/edição/exclusão de ativos:
-   - Domínio arquitetural
-   - Serviço de negócio
-   - Serviço de aplicação
-   - Componente tecnológico
-2. Cadastro de relacionamentos e nível de impacto.
-3. Visão da arquitetura em camadas.
-4. Identificação de ativos críticos.
-5. Detecção de redundância por nome/tipo.
-6. Ranking de pontos de concentração de dependências.
-7. Análise de impacto cruzado usando dependências recursivas.
-8. Persistência real no arquivo `arquitetura.db`.
+---
 
-## Executar localmente
+## 🎯 Objetivo
 
-Requisitos: Node.js 18+.
+Centralizar informações relacionadas à arquitetura empresarial e facilitar a análise das dependências entre diferentes componentes de tecnologia.
 
-```bash
-npm install
-npm start
-```
+A solução permite mapear:
 
-Depois abra:
-http://localhost:3000
+- Domínios arquiteturais
+- Serviços de negócio
+- Serviços de aplicação
+- Componentes tecnológicos
 
-O banco SQLite é criado automaticamente na primeira execução.
+A partir desses relacionamentos, o sistema auxilia na identificação de **dependências, redundâncias, ativos críticos e impactos entre componentes**.
 
-## Deploy
+---
 
-O projeto pode ser publicado em qualquer ambiente que aceite uma aplicação Node.js e mantenha armazenamento de arquivos persistente.
+## ⚙️ Funcionalidades
 
-Comando de inicialização:
-```bash
-npm start
-```
+- Cadastro, edição e exclusão de ativos
+- Cadastro de relacionamentos entre componentes
+- Definição de níveis de impacto
+- Visualização da arquitetura em camadas
+- Identificação de ativos críticos
+- Detecção de possíveis redundâncias
+- Ranking de concentração de dependências
+- Análise de impacto cruzado
+- Persistência de dados utilizando SQLite
+- Geração de relatório em PDF
 
-Porta:
-- Usa `process.env.PORT` quando fornecida pelo provedor.
-- Caso contrário, usa 3000.
+---
 
-### Observação sobre SQLite em plataformas cloud
-SQLite grava em arquivo. Em plataformas com filesystem efêmero, os dados podem ser perdidos após reinicialização/deploy. Para uma entrega acadêmica ou servidor com disco persistente, o SQLite atende ao requisito. Em produção com múltiplas instâncias, recomenda-se migrar para PostgreSQL/MySQL.
+## 🛠️ Tecnologias
 
-## Estrutura
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+
+---
+
+## 🧩 Arquitetura da Aplicação
+
+A aplicação utiliza uma arquitetura simples composta por:
+
+**Frontend**  
+HTML, CSS e JavaScript responsáveis pela interface e interação com o usuário.
+
+**Backend**  
+Node.js e Express responsáveis pela API e regras da aplicação.
+
+**Banco de Dados**  
+SQLite utilizado para persistência dos ativos e relacionamentos cadastrados.
+
+---
+
+## 📂 Estrutura
 
 ```text
-arquitetura-empresarial/
+enterprise-architecture-system/
+│
 ├── public/
 │   └── index.html
-├── server.js
+│
+├── servidor.js
 ├── package.json
+├── package-lock.json
 ├── README.md
 └── .gitignore
-```
-
-O arquivo `arquitetura.db` não é incluído no ZIP porque ele é criado automaticamente no primeiro start.
