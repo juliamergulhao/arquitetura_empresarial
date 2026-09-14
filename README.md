@@ -1,5 +1,9 @@
 # Enterprise Architecture System 🏢
 
+O sistema está publicado e pode ser acessado online:
+
+👉 **[Acessar Enterprise Architecture System](https://arquitetura-empresarial.onrender.com/)**
+
 Sistema web desenvolvido para **mapeamento e análise de arquitetura empresarial**, permitindo organizar ativos tecnológicos, visualizar dependências e identificar pontos críticos dentro de uma estrutura corporativa.
 
 A aplicação permite representar diferentes camadas da arquitetura de TI e analisar como serviços, aplicações e componentes tecnológicos se relacionam.
