@@ -74,7 +74,7 @@ enterprise-architecture-system/
 ├── public/
 │   └── index.html
 │
-├── servidor.js
+├── server.js
 ├── package.json
 ├── package-lock.json
 ├── README.md
